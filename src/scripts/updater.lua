@@ -488,7 +488,7 @@ end
 
 local function TableWithKeysLength(tableA)
 	local count = 0
-	for k, v in pairs(tableA) do
+	for k, _ in pairs(tableA) do
 		count = count + 1
 	end
 	return count
@@ -622,7 +622,7 @@ end
 --[[Module exports]]--
 ----------------------
 
-function Public.init()  
+function Public.init()
   RegisterClusterioEvents()
 end
 

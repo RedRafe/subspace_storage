@@ -9,17 +9,7 @@ local Updater = require("scripts.updater")
 ---------------------
 --[[Remote things]]--
 ---------------------
-remote.add_interface("clusterio",
-{
-	printStorage = function()
-		local items = ""
-		for itemName, itemCount in pairs(global.itemStorage) do
-			items = items.."\n"..itemName..": "..tostring(itemCount)
-		end
-		game.print(items)
-	end,
-	reset = Reset,
-})
+Global.add_interface()
 
 ------------------------------
 --[[Thing resetting events]]--

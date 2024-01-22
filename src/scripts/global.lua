@@ -1,5 +1,4 @@
 local Public = {}
-local config = require("config")
 local clusterio_api = require("__clusterio_lib__/api")
 
 
@@ -9,10 +8,11 @@ local clusterio_api = require("__clusterio_lib__/api")
 
 local function UpdateSettings()
 	global.setting_infinity_mode     = settings.global["subspace_storage-infinity-mode"].value
+	global.setting_max_electricity   = settings.global["subspace_storage-max-electricity"].value
 	global.setting_zone_width        = settings.global["subspace_storage-zone-width"].value
 	global.setting_zone_height       = settings.global["subspace_storage-zone-height"].value
-	global.setting_range_restriction = settings.global["subspace_storage-range-restriction-enabled"].value
-	global.setting_max_electricity   = settings.global["subspace_storage-max-electricity"].value
+	global.setting_range_restriction = settings.global["subspace_storage-range-restriction-enabled"].value and not ((global.setting_zone_width == 0) and (global.setting_zone_height == 0))
+	global.setting_entity_limit      = settings.global["subspace_storage-entity-limit"].value
 end
 
 local function Reset()
@@ -20,6 +20,15 @@ local function Reset()
 
 	global.isConnected = false
 	global.prevIsConnected = false
+
+	global.setting_infinity_mode     = false
+	global.setting_zone_width        = 0
+	global.setting_zone_height       = 0
+	global.setting_range_restriction = false
+	global.setting_max_electricity   = 10^8
+	global.setting_entity_limit      = 0
+
+	global.entityCount = 0
 
 	global.allowedToMakeElectricityRequests = false
 
@@ -100,10 +109,24 @@ end
 --[[Module exports]]--
 ----------------------
 
+function Public.add_interface()
+	remote.add_interface("clusterio",
+	{
+		printStorage = function()
+			local items = ""
+			for itemName, itemCount in pairs(global.itemStorage) do
+				items = items.."\n"..itemName..": "..tostring(itemCount)
+			end
+			game.print(items)
+		end,
+		reset = Reset,
+	})
+end
+
 function Public.on_init()
 	clusterio_api.init()
-	UpdateSettings()
 	Reset()
+	UpdateSettings()
 end
 
 function Public.on_load()
